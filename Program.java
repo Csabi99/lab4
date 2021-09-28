@@ -6,7 +6,7 @@ import java.util.Iterator;
 import static java.lang.Double.parseDouble;
 
 public class Program {
-    static ArrayList<Beer> list= new ArrayList();
+    static ArrayList<Beer> list= new ArrayList<Beer>();
     public static void main(String[] args){
         Beer b1;
         b1 = new Beer("Gösser", "világos", 5.6);
@@ -30,20 +30,10 @@ public class Program {
                 System.exit(0);
             }
             else if(commands[0].equals("add")){
-                try{
-                    add(commands);
-                }
-                catch(Throwable e){
-                    System.out.println("Sikertelen vegrehajtas");
-                }
+            	add(commands);
             }
             else if(commands[0].equals("list")){
-                try{
-                    list(commands);
-                }
-                catch(Throwable e){
-                    System.out.println("Sikertelen vegrehajtas");
-                }
+                list(commands);
             }
             else if(commands[0].equals("save")){
                 save(commands);
@@ -58,56 +48,108 @@ public class Program {
                 find(commands);
             }
             else if(commands[0].equals("delete")){
-                delete(commands);
+                try{
+                	delete(commands);
+                }
+                catch(Exception e){
+                	System.out.println("Sikertelen torles");
+                }
             }
         }
     }
 
-    protected static void delete(String[] commands) {
+    protected static void delete(String[] commands) throws Exception {
         Iterator<Beer> i=list.iterator();
-        while(i.hasNext()){
+        boolean found=false;
+        while(i.hasNext() && !found){
             if(i.next().getName().equals(commands[1])){
                 i.remove();
+                found=true;
             }
+        }
+        if(!found){
+        	throw new Exception("Hiba");
         }
     }
 
     protected static void find(String[] commands) {
         for(Beer i : list){
-            if(i.getName().contains(commands[1])){
-                System.out.println(i.toString());
-            }
+        	if(commands[1].equals("name")){
+        		if(i.getName().contains(commands[2])){
+                    System.out.println(i.toString());
+                }
+        	}
+        	else if(commands[1].equals("style")){
+        		if(i.getStyle().contains(commands[2])){
+                    System.out.println(i.toString());
+                }
+        	}
+        	else if(commands[1].equals("strength")){
+        		if(i.getStrength()>=parseDouble(commands[2])){
+                    System.out.println(i.toString());
+                }
+        	}
+        	else if(commands[1].equals("weaker")){
+        		if(i.getStrength()<=parseDouble(commands[2])){
+                    System.out.println(i.toString());
+                }
+        	}
+        	
         }
     }
 
     protected static void search(String[] commands) {
         for(Beer i : list){
-            if(i.getName().equals(commands[1])){
-                System.out.println(i.toString());
-            }
+        	if(commands[1].equals("name")){
+        		if(i.getName().equals(commands[2])){
+                    System.out.println(i.toString());
+                }
+        	}
+        	else if(commands[1].equals("style")){
+        		if(i.getStyle().equals(commands[2])){
+                    System.out.println(i.toString());
+                }
+        	}
+        	else if(commands[1].equals("strength")){
+        		if(i.getStrength()==parseDouble(commands[2])){
+                    System.out.println(i.toString());
+                }
+        	}
         }
     }
 
     protected static void list(String[] commands) {
-        if(commands[1].equals("name")){
+        try{
+        	if(commands[1].equals("name")){
+        
             Collections.sort(list, new NameComparator());
+	        }
+	        else if(commands[1].equals("style")){
+	            Collections.sort(list, new StyleComparator());
+	        }
+	        else if(commands[1].equals("strength")){
+	            Collections.sort(list, new StrengthComparator());
+	        }
         }
-        else if(commands[1].equals("style")){
-            Collections.sort(list, new StyleComparator());
-        }
-        else if(commands[1].equals("strength")){
-            Collections.sort(list, new StrengthComparator());
+        catch(IndexOutOfBoundsException e){
+        	e.printStackTrace();
         }
         Iterator<Beer> i=list.iterator();
         while(i.hasNext()){
             System.out.println(i.next().toString());
-        }
+        }        
     }
 
     protected static void add(String[] commands) {
-        double percent=parseDouble(commands[3]);
-        Beer b1=new Beer(commands[1], commands[2], percent);
-        list.add(b1);
+        try{
+        	double percent=parseDouble(commands[3]);
+        	Beer b1=new Beer(commands[1], commands[2], percent);
+        	list.add(b1);
+        }
+        catch(IndexOutOfBoundsException e){
+        	System.out.println("Sikertelen vegrehajtas");
+        }
+        
     }
     protected static void save(String[] commands){
         try{
